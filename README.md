@@ -36,7 +36,6 @@ FitAura/
 │── metadata.json # Project metadata
 │── README.md # Documentation
 
-
 This structure separates UI, logic, and configuration files, making the project easy to maintain and scalable.
 
 ---
