@@ -1,0 +1,7 @@
+{
+  "name": "FitAura",
+  "description": "A premium, aesthetic health and wellness dashboard with activity tracking, nutrition logging, and gamification.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

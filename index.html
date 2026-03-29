@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FitAura</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-dark font-outfit">
+    
+    <!-- App Container -->
+    <div id="app" class="relative min-h-screen w-full max-w-md mx-auto flex flex-col shadow-2xl">
+        
+        <!-- Background Glows -->
+        <div class="glow glow-1 fixed"></div>
+        <div class="glow glow-2 fixed"></div>
+
+        <!-- Top Header -->
+        <header class="px-6 pt-6 pb-2 flex justify-between items-end z-10">
+            <div>
+                <p id="greeting" class="text-xs uppercase tracking-[0.2em] text-white/40 font-semibold mb-1">Good Morning</p>
+                <h1 class="text-2xl font-bold tracking-tight">Hi, <span id="user-name-dash">Alex</span></h1>
+            </div>
+            <div class="flex flex-col items-end">
+                <div class="flex items-center space-x-2 mb-2">
+                    <div class="flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-3 py-1">
+                        <span class="text-[10px] font-bold text-primary uppercase tracking-wider">Level</span>
+                        <span id="user-level" class="text-sm font-black">1</span>
+                    </div>
+                </div>
+                <div class="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div id="xp-progress" class="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content (Scrollable Area) -->
+        <main id="main-content" class="flex-1 relative z-10">
+            
+            <!-- Dashboard Section -->
+            <section id="section-dashboard" class="section p-4 space-y-4 active">
+                <!-- App Branding -->
+                <div class="text-center py-6">
+                    <h1 class="text-5xl font-black tracking-tighter uppercase italic bg-gradient-to-b from-white to-white/20 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">FitAura</h1>
+                    <div class="w-12 h-0.5 bg-primary mx-auto mt-2 rounded-full opacity-50 shadow-[0_0_10px_var(--primary)]"></div>
+                </div>
+                
+                <!-- Quote Card -->
+                <div class="glass-card bg-gradient-to-br from-primary/5 to-transparent">
+                    <i data-lucide="quote" class="w-5 h-5 text-primary/50 mb-3"></i>
+                    <p id="quote-text" class="text-lg font-medium leading-relaxed italic">"The only way to keep your health is to eat what you don't want."</p>
+                    <p id="quote-author" class="text-xs mt-3 text-white/30 uppercase tracking-widest">— Mark Twain</p>
+                </div>
+
+                <!-- Main Stats Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card flex flex-col items-center justify-center text-center space-y-2">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-1">
+                            <i data-lucide="droplets"></i>
+                        </div>
+                        <h3 class="text-2xl font-black" id="dash-water">0L</h3>
+                        <p class="text-xs text-white/40 uppercase tracking-widest">Hydration</p>
+                    </div>
+                    <div class="glass-card flex flex-col items-center justify-center text-center space-y-2">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-500/20 flex items-center justify-center text-purple-400 mb-1">
+                            <i data-lucide="footprints"></i>
+                        </div>
+                        <h3 class="text-2xl font-black" id="dash-steps">0</h3>
+                        <p class="text-xs text-white/40 uppercase tracking-widest">Steps</p>
+                    </div>
+                </div>
+
+                <!-- XP Summary -->
+                <div class="glass-card bg-gradient-to-r from-primary/10 to-secondary/10 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+                            <i data-lucide="zap" class="text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm">Total Energy (XP)</h3>
+                            <p class="text-xs text-white/50"><span id="total-xp">0</span> XP Earned</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-white/40 uppercase tracking-widest mb-1">Next Level</p>
+                        <p class="text-xs font-bold text-primary" id="xp-to-next">500 XP</p>
+                    </div>
+                </div>
+
+                <!-- Daily Progress -->
+                <div class="glass-card space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-bold uppercase tracking-wider">Nutrition Goal</h3>
+                        <span class="text-xs text-white/40" id="cal-percent">0%</span>
+                    </div>
+                    <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden">
+                        <div id="cal-progress-bar" class="h-full bg-gradient-to-r from-orange-400 to-red-500" style="width: 0%; transition: width 1s ease-in-out;"></div>
+                    </div>
+                    <div class="flex justify-between text-xs font-bold text-white/30 uppercase tracking-widest">
+                        <span>0 kcal</span>
+                        <span id="dash-calories">0 / 2500 kcal</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity Section -->
+            <section id="section-activity" class="section p-4 space-y-6">
+                <div class="text-center space-y-1">
+                    <h2 class="text-3xl font-bold tracking-tight">Activity</h2>
+                    <p class="text-white/40 text-sm">Keep moving, keep growing</p>
+                </div>
+
+                <!-- Activity Summary Card -->
+                <div class="glass-card grid grid-cols-2 gap-x-3 gap-y-4">
+                    <div class="flex flex-col space-y-1 min-w-0">
+                        <span class="text-[9px] text-white/30 uppercase tracking-widest font-bold truncate">Steps</span>
+                        <div class="flex items-baseline space-x-1 overflow-hidden">
+                            <span id="summary-steps" class="text-xl font-black truncate">0</span>
+                            <span class="text-[9px] text-white/30 flex-shrink-0">pts</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col space-y-1 min-w-0">
+                        <span class="text-[9px] text-white/30 uppercase tracking-widest font-bold truncate">Calories</span>
+                        <div class="flex items-baseline space-x-1 overflow-hidden">
+                            <span id="summary-calories" class="text-xl font-black truncate">0</span>
+                            <span class="text-[9px] text-white/30 flex-shrink-0">kcal</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col space-y-1 min-w-0">
+                        <span class="text-[9px] text-white/30 uppercase tracking-widest font-bold truncate">Active Time</span>
+                        <div class="flex items-baseline space-x-1 overflow-hidden">
+                            <span id="summary-minutes" class="text-xl font-black truncate">0</span>
+                            <span class="text-[9px] text-white/30 flex-shrink-0">min</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col space-y-1 min-w-0">
+                        <span class="text-[9px] text-white/30 uppercase tracking-widest font-bold truncate">Distance</span>
+                        <div class="flex items-baseline space-x-1 overflow-hidden">
+                            <span id="summary-distance" class="text-xl font-black truncate">0.0</span>
+                            <span class="text-[9px] text-white/30 flex-shrink-0">km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goal Progress Card -->
+                <div class="glass-card space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-white/50">Daily Step Goal</h3>
+                        <span id="goal-percent" class="text-xs font-bold text-primary">0%</span>
+                    </div>
+                    <div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div id="goal-progress-bar" class="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] font-bold text-white/20 uppercase tracking-widest">
+                        <span>0</span>
+                        <span>Goal: <span id="goal-target">10,000</span></span>
+                    </div>
+                </div>
+
+                <!-- Workout Timer Card -->
+                <div class="glass-card space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-white/50">Workout Timer</h3>
+                        <div id="timer-status" class="flex items-center space-x-2">
+                            <div class="w-2 h-2 rounded-full bg-white/20" id="timer-dot"></div>
+                            <span class="text-[10px] uppercase tracking-widest text-white/30" id="timer-label">Ready</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center py-4">
+                        <span id="workout-timer-display" class="text-6xl font-black tracking-tighter tabular-nums">00:00:00</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <button id="timer-reset" class="h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                            <i data-lucide="rotate-ccw" class="w-5 h-5 text-white/60"></i>
+                        </button>
+                        <button id="timer-start" class="h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                            <i data-lucide="play" class="w-5 h-5 text-white" id="timer-play-icon"></i>
+                        </button>
+                        <button id="timer-stop" class="h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                            <i data-lucide="square" class="w-5 h-5 text-white/60"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step Controls (Existing feature kept) -->
+                <div class="glass-card flex items-center justify-between p-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400">
+                            <i data-lucide="footprints" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-white/40 uppercase tracking-widest">Manual Log</p>
+                            <p class="text-sm font-bold">+500 Steps</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="steps-minus" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10">
+                            <i data-lucide="minus" class="w-4 h-4 text-white/60"></i>
+                        </button>
+                        <button id="steps-plus" class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 text-white"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Graphs Section -->
+                <div class="space-y-6">
+                    <!-- Weekly Steps Graph -->
+                    <div class="glass-card space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-white/50">Weekly Steps</h3>
+                        <div class="h-48 w-full">
+                            <canvas id="stepsLineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Calories Comparison Graph -->
+                    <div class="glass-card space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-white/50">Calories: Burned vs Consumed</h3>
+                        <div class="h-48 w-full">
+                            <canvas id="caloriesBarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Activity Distribution -->
+                    <div class="glass-card space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-white/50">Activity Distribution</h3>
+                        <div class="h-48 w-full flex justify-center">
+                            <canvas id="activityDoughnutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Log Card -->
+                <div class="glass-card space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-white/50">Activity Log</h3>
+                        <button id="clear-log" class="px-6 py-1.5 rounded-full bg-red-600 text-white text-[11px] uppercase tracking-widest font-bold hover:bg-red-700 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-red-600/40 border border-white/10">Clear</button>
+                    </div>
+                    <div id="activity-log-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Log items will be injected here -->
+                        <div class="flex items-center justify-center py-8 text-white/20 italic text-xs">
+                            No activities logged today
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Nutrition Section -->
+            <section id="section-nutrition" class="section p-4 space-y-6">
+                <div class="text-center space-y-2">
+                    <h2 class="text-3xl font-bold tracking-tight">Nutrition</h2>
+                    <p class="text-white/40 text-sm">Fuel your body right</p>
+                </div>
+
+                <!-- Water Tracker Card -->
+                <div class="glass-card space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                                <i data-lucide="droplets" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="font-bold">Water Intake</h3>
+                        </div>
+                        <span id="water-display" class="text-xl font-black text-blue-400">0.0L</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-4 gap-3">
+                        <button class="water-btn h-12 rounded-xl text-xs font-bold transition-all" data-amount="250">250ml</button>
+                        <button class="water-btn h-12 rounded-xl text-xs font-bold transition-all" data-amount="500">500ml</button>
+                        <button class="water-btn h-12 rounded-xl text-xs font-bold transition-all" data-amount="750">750ml</button>
+                        <button id="water-reset" class="water-btn h-12 rounded-xl text-xs font-bold transition-all">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Calories Tracker Card -->
+                <div class="glass-card space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                                <i data-lucide="flame" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="font-bold">Calories</h3>
+                        </div>
+                        <span id="calories-display" class="text-xl font-black text-orange-400">0 kcal</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex space-x-3">
+                            <input type="number" id="cal-input" placeholder="Enter calories..." class="flex-1">
+                            <button id="add-cal-btn" class="cal-btn px-6 h-12 rounded-xl font-bold text-sm">Add</button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="quick-cal cal-btn h-12 rounded-xl text-xs font-bold transition-all" data-val="150">Snack (150)</button>
+                            <button class="quick-cal cal-btn h-12 rounded-xl text-xs font-bold transition-all" data-val="500">Meal (500)</button>
+                            <button id="cal-reset" class="cal-btn h-12 rounded-xl text-xs font-bold transition-all">Clear All</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="section-profile" class="section p-4 space-y-6">
+                <div class="flex flex-col items-center space-y-4 py-4">
+                    <div class="relative">
+                        <div class="w-[120px] h-[120px] rounded-full bg-gradient-to-tr from-primary via-secondary to-accent p-1 shadow-xl">
+                            <div class="w-full h-full rounded-full bg-dark flex items-center justify-center overflow-hidden">
+                                <img id="profile-img" src="https://picsum.photos/seed/fitness/200" alt="Profile" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                        <button id="change-photo-btn" class="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-primary border-4 border-dark flex items-center justify-center shadow-lg">
+                            <i data-lucide="camera" class="w-4 h-4 text-white"></i>
+                        </button>
+                        <input type="file" id="photo-input" class="hidden" accept="image/*">
+                    </div>
+                    <div class="text-center w-full max-w-[200px] space-y-2">
+                        <div class="flex items-center justify-center space-x-2">
+                            <h2 id="profile-name-display" class="text-2xl font-bold">Alex Wellness</h2>
+                            <button id="edit-name-btn" class="p-2 bg-white/5 text-amber-500 hover:bg-white/10 hover:text-amber-400 hover:scale-110 transition-all cursor-pointer rounded-full border border-white/10 shadow-sm">
+                                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <div id="name-edit-container" class="hidden animate-fade-in">
+                            <div class="flex space-x-2">
+                                <input type="text" id="name-input" placeholder="Enter name..." class="h-10 text-sm py-0 px-4">
+                                <button id="save-name-btn" class="bg-primary text-white px-4 h-10 rounded-xl font-bold text-xs">Save</button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-white/40 uppercase tracking-widest">Premium Member</p>
+                    </div>
+                </div>
+
+                <!-- BMI Calculator Card -->
+                <div class="glass-card space-y-6">
+                    <h3 class="font-bold flex items-center space-x-2">
+                        <i data-lucide="scale" class="w-4 h-4 text-accent"></i>
+                        <span>BMI Calculator</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-xs text-white/30 uppercase tracking-widest ml-1">Height (cm)</label>
+                            <input type="number" id="bmi-height" placeholder="175">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs text-white/30 uppercase tracking-widest ml-1">Weight (kg)</label>
+                            <input type="number" id="bmi-weight" placeholder="70">
+                        </div>
+                    </div>
+
+                    <button id="calculate-bmi" class="w-full bg-accent text-dark h-14 rounded-2xl font-bold text-sm shadow-lg shadow-accent/20">
+                        Calculate & Save
+                    </button>
+
+                    <div id="bmi-result" class="hidden pt-6 border-t border-white/5 text-center space-y-2 animate-fade-in">
+                        <p class="text-xs text-white/30 uppercase tracking-widest">Your BMI Score</p>
+                        <div class="text-4xl font-black text-accent" id="bmi-score">22.5</div>
+                        <p class="text-sm font-medium text-white/60" id="bmi-category">Normal Weight</p>
+                    </div>
+                </div>
+
+                <!-- Settings List Card -->
+                <div class="glass-card p-0 overflow-hidden">
+                    <div class="p-5 flex items-center justify-between border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="bell" class="w-4 h-4 text-white/40"></i>
+                            <span class="text-sm font-medium">Notifications</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-white/20"></i>
+                    </div>
+                    <div class="p-5 flex items-center justify-between border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-white/40"></i>
+                            <span class="text-sm font-medium">Privacy & Security</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-white/20"></i>
+                    </div>
+                    <div class="p-5 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="log-out" class="w-4 h-4 text-red-400/60"></i>
+                            <span class="text-sm font-medium text-red-400/80">Logout</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-black/80 backdrop-blur-2xl border-t border-white/10 px-6 py-4 flex justify-around items-center z-20">
+            <button class="nav-btn active" data-target="dashboard">
+                <i data-lucide="layout-grid"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-btn" data-target="activity">
+                <i data-lucide="activity"></i>
+                <span>Move</span>
+            </button>
+            <button class="nav-btn" data-target="nutrition">
+                <i data-lucide="apple"></i>
+                <span>Eat</span>
+            </button>
+            <button class="nav-btn" data-target="profile">
+                <i data-lucide="user"></i>
+                <span>Me</span>
+            </button>
+        </nav>
+
+        <!-- Level Up Overlay -->
+        <div id="level-up-overlay" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8 hidden opacity-0 transition-opacity duration-500">
+            <div class="text-center space-y-6 transform scale-90 transition-transform duration-500" id="level-up-content">
+                <div class="relative inline-block">
+                    <div class="absolute inset-0 bg-primary blur-3xl opacity-50 animate-pulse"></div>
+                    <div class="relative w-32 h-32 rounded-[3rem] bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-2xl">
+                        <i data-lucide="trophy" class="w-16 h-16 text-white"></i>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-4xl font-black tracking-tighter uppercase italic">Level Up!</h2>
+                    <p class="text-white/60">You've reached Level <span id="new-level-val">2</span></p>
+                </div>
+                <button id="close-level-up" class="bg-white text-black px-10 py-4 rounded-2xl font-bold text-sm active:scale-95 transition-transform">Awesome!</button>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 z-[60] glass-card px-6 py-3 rounded-2xl border border-primary/30 flex items-center space-x-3 pointer-events-none opacity-0 translate-y-[-20px] transition-all duration-300">
+            <div class="w-6 h-6 rounded-lg bg-primary/20 flex items-center justify-center">
+                <i data-lucide="zap" class="w-3 h-3 text-primary"></i>
+            </div>
+            <span id="toast-msg" class="text-xs font-bold tracking-tight"></span>
+        </div>
+
+    </div>
+
+    <script src="gamification.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
